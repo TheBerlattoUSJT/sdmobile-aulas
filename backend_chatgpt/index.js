@@ -6,12 +6,20 @@ const app = express()
 // e converte o texto para objeto JavaScript)
 app.use(express.json())
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-console.log(OPENAI_API_KEY)
 
 //POST /pergunte-ao-chatgpt () => {}
-app.post('/pergunte-ao-chatgpt', (req, res) => {
+app.post('/pergunte-ao-chatgpt', async (req, res) => {
     const openai = new OpenAI(OPENAI_API_KEY)
-    res.json({mensagem: 'Ok'})
+    const prompt = req.body.prompt //prompt que vai ser enviado ao chatgpt
+    const model = 'gpt-4o-mini' //modelo de gpt que utilizaremos
+    const role = 'user'
+    const max_tokens = 50 //maximo de tokens que podera utilizar com base no preço
+    const completion = await openai.chat.completions.create({
+        messages: [{role: role, content: prompt}],
+        model: model,
+        max_tokens: max_tokens
+    })
+    res.json({completion: completion.choices[0].message.content})
 })
 
 //GET /oi?nome=Ana
