@@ -1,11 +1,21 @@
 require('dotenv').config()
 const express = require('express')
-const { OpenAI } = require('openai')
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 const app = express()
 //função middleware(fica no meio do caminho entre o disparo da requisição e a função alvo 
 // e converte o texto para objeto JavaScript)
 app.use(express.json())
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+
+app.post('/pergunte-ao-gemini', async (req, res) => {
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash'
+    })
+    const { prompt } = req.body
+    const result = await model.generateContent(prompt)
+    res.json({completion: result.response.text()})
+})
 
 //POST /pergunte-ao-chatgpt () => {}
 app.post('/pergunte-ao-chatgpt', async (req, res) => {
